@@ -1,0 +1,8 @@
+{
+  "recommendations": [
+    "tamasfe.even-better-toml",
+    "bram209.leptos-language-server",
+    "ms-playwright.playwright",
+    "rust-lang.rust-analyzer"
+  ]
+}
