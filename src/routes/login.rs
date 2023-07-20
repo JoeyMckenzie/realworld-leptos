@@ -14,24 +14,6 @@ pub fn Login(cx: Scope) -> impl IntoView {
                         <p class="text-xs-center">
                             <A href="/register">"Need an account?"</A>
                         </p>
-                        <AuthErrors/>
-                        <form>
-                            <fieldset class="form-group">
-                                <input
-                                    class="form-control form-control-lg"
-                                    type="text"
-                                    placeholder="Email"
-                                />
-                            </fieldset>
-                            <fieldset class="form-group">
-                                <input
-                                    class="form-control form-control-lg"
-                                    type="password"
-                                    placeholder="Password"
-                                />
-                            </fieldset>
-                            <button class="btn btn-lg btn-primary pull-xs-right">"Sign in"</button>
-                        </form>
                     </div>
                 </div>
             </div>

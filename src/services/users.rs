@@ -7,7 +7,7 @@ use crate::{
     error_template::AppError,
     models::{
         errors::ApiError,
-        users::{AuthRequest, AuthResponse, User},
+        users::{AuthRequest, AuthResponse, AuthResponseContext},
     },
 };
 
@@ -42,8 +42,8 @@ impl UsersService {
         username: String,
         email: String,
         password: String,
-    ) -> Result<User, AppError> {
-        log::info!("registering user {}", email);
+    ) -> Result<AuthResponseContext, AppError> {
+        leptos::log!("registering user {}", email);
 
         let request = AuthRequest::new(Some(username), email, password);
         let response = self
@@ -55,15 +55,15 @@ impl UsersService {
 
         match response.status() {
             StatusCode::OK => {
-                log::info!("user successfully register");
+                leptos::log!("user successfully register");
                 let user = response.json::<AuthResponse>().await?;
-                Ok(user.user)
+                Ok(AuthResponseContext::AuthenticatedUser(user.user))
             }
             StatusCode::UNPROCESSABLE_ENTITY => {
-                log::error!("failed to register user");
+                leptos::log!("failed to register user");
                 let validation_errors = response.json::<ApiError>().await?;
-                log::error!("validation failures: {:?}", validation_errors);
-                Err(AppError::ValidationFailed(validation_errors))
+                leptos::log!("validation failures: {:?}", validation_errors);
+                Ok(AuthResponseContext::ValidationError(validation_errors))
             }
             _ => Err(AppError::InternalError),
         }

@@ -1,5 +1,7 @@
 use serde::{Deserialize, Serialize};
 
+use super::errors::ApiError;
+
 #[derive(Debug, Serialize)]
 pub struct UserRequest {
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -29,6 +31,12 @@ impl AuthRequest {
             user: UserRequest::new(username, email, password),
         }
     }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub enum AuthResponseContext {
+    AuthenticatedUser(User),
+    ValidationError(ApiError),
 }
 
 #[derive(Debug, Deserialize)]

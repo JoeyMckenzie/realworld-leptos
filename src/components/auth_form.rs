@@ -1,7 +1,12 @@
-use leptos::{leptos_dom::console_log, tracing::info, *};
+use leptos::{leptos_dom::console_log, *};
 use leptos_router::ActionForm;
 
-use crate::{models::users::User, services::users::UsersService};
+use crate::{
+    components::auth_errors::AuthErrors,
+    error_template::AppError,
+    models::users::{AuthResponseContext, User},
+    services::users::UsersService,
+};
 
 #[server(SubmitAuthForm, "/api")]
 #[tracing::instrument(skip(password))]
@@ -9,38 +14,34 @@ pub async fn submit_auth_form(
     username: Option<String>,
     email: String,
     password: String,
-) -> Result<User, ServerFnError> {
+) -> Result<AuthResponseContext, ServerFnError> {
     let service = UsersService::new();
-
-    match service.register(username.unwrap(), email, password).await {
-        Ok(user) => Ok(user),
-        Err(e) => Err(ServerFnError::ServerError(e.to_string())),
-    }
-
-    // if let Err(e) = response {
-    //     match e {
-    //         AppError::ValidationFailed(err) => {
-
-    //         },
-    //         _ => return Err(e.into()),
-    //     }
-    // }
+    let response = service.register(username.unwrap(), email, password).await?;
+    Ok(response)
 }
 
 #[component]
 pub fn AuthForm(cx: Scope, #[prop(default = true)] include_username: bool) -> impl IntoView {
     let submit_auth_form = create_server_action::<SubmitAuthForm>(cx);
+    let (auth_errors, set_auth_errors) = create_signal(cx, Vec::<String>::new());
 
     // holds the latest *returned* value from the server
     let submit_auth_value = submit_auth_form.value();
 
     // check if the server has returned an error
-    let has_error = move || {
+    let errors = move || {
         submit_auth_value.with(|val| {
-            if let Some(Err(submit_auth_error)) = val {
-                console_log(&format!("{}", submit_auth_error));
+            if let Some(Ok(auth_response_context)) = val {
+                match auth_response_context {
+                    AuthResponseContext::AuthenticatedUser(user) => {
+                        leptos::log!("user created {:?}", user)
+                    }
+                    AuthResponseContext::ValidationError(validation_errors) => {
+                        leptos::log!("user not created");
+                        set_auth_errors(validation_errors.to_owned().into_errors())
+                    }
+                }
             }
-            // matches!(val, Some(Err(_)));
         })
     };
 
@@ -53,6 +54,7 @@ pub fn AuthForm(cx: Scope, #[prop(default = true)] include_username: bool) -> im
     };
 
     view! { cx,
+        <AuthErrors errors=auth_errors/>
         <ActionForm action=submit_auth_form>
             <Show when=move || include_username fallback=|_| {}>
                 <fieldset class="form-group">
@@ -80,7 +82,9 @@ pub fn AuthForm(cx: Scope, #[prop(default = true)] include_username: bool) -> im
                     placeholder="Password"
                 />
             </fieldset>
-            <button class="btn btn-lg btn-primary pull-xs-right" type="submit">{button_text}</button>
+            <button class="btn btn-lg btn-primary pull-xs-right" type="submit">
+                {button_text}
+            </button>
         </ActionForm>
     }
 }

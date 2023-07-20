@@ -1,7 +1,7 @@
 use leptos::*;
 use leptos_router::A;
 
-use crate::components::{auth_errors::AuthErrors, auth_form::AuthForm};
+use crate::components::auth_form::AuthForm;
 
 #[component]
 pub fn Register(cx: Scope) -> impl IntoView {
@@ -14,7 +14,6 @@ pub fn Register(cx: Scope) -> impl IntoView {
                         <p class="text-xs-center">
                             <A href="/login">"Have an account?"</A>
                         </p>
-                        <AuthErrors/>
                         <AuthForm/>
                     </div>
                 </div>
