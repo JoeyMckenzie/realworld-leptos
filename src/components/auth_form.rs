@@ -23,26 +23,22 @@ pub async fn submit_auth_form(
 #[component]
 pub fn AuthForm(cx: Scope, #[prop(default = true)] include_username: bool) -> impl IntoView {
     let submit_auth_form = create_server_action::<SubmitAuthForm>(cx);
-    let (auth_errors, set_auth_errors) = create_signal(cx, Vec::<String>::new());
+    let (auth_errors, set_auth_errors) = create_signal::<Option<Vec<String>>>(cx, None);
 
     // holds the latest *returned* value from the server
     let submit_auth_value = submit_auth_form.value();
 
-    // check if the server has returned an error
-    let errors = move || {
-        submit_auth_value.with(|val| {
-            if let Some(Ok(auth_response_context)) = val {
-                match auth_response_context {
-                    AuthResponseContext::AuthenticatedUser(user) => {
-                        leptos::log!("user created {:?}", user)
-                    }
-                    AuthResponseContext::ValidationError(validation_errors) => {
-                        leptos::log!("user not created");
-                        set_auth_errors(validation_errors.to_owned().into_errors())
-                    }
+    match submit_auth_value.get() {
+        None => (),
+        Some(context_result) => match context_result {
+            Ok(context) => match context {
+                AuthResponseContext::AuthenticatedUser(_) => (),
+                AuthResponseContext::ValidationError(validation_errors) => {
+                    set_auth_errors(Some(validation_errors.into_errors()))
                 }
-            }
-        })
+            },
+            Err(_) => (),
+        },
     };
 
     let button_text = move || {
