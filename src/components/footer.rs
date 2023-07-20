@@ -9,7 +9,13 @@ pub fn Footer(cx: Scope) -> impl IntoView {
                     "conduit"
                 </a>
                 <span class="attribution">
-                    "An interactive learning project from"
+                    //thinkster.io">"Thinkster"</a> ". Code &
+                    //thinkster.io">"Thinkster"</a> ". Code &
+                    //thinkster.io">"Thinkster"</a> ". Code &
+                    //thinkster.io">"Thinkster"</a> ". Code &
+                    //thinkster.io">"Thinkster"</a> ". Code &
+                    //thinkster.io">"Thinkster"</a> ". Code &
+                    "An interactive learning project from" //thinkster.io">"Thinkster"</a> ". Code &
                     <a href="https://thinkster.io">"Thinkster"</a> ". Code &
                     design licensed under MIT."
                 </span>

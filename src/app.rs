@@ -1,7 +1,7 @@
 use crate::{
     components::{footer::Footer, navbar::Navbar},
     error_template::{AppError, ErrorTemplate},
-    pages::{home::Home, login::Login, register::Register},
+    routes::{home::Home, login::Login, register::Register},
 };
 use leptos::*;
 use leptos_meta::*;
@@ -20,8 +20,7 @@ pub fn App(cx: Scope) -> impl IntoView {
         <Router fallback=|cx| {
             let mut outside_errors = Errors::default();
             outside_errors.insert_with_default_key(AppError::NotFound);
-            view! { cx, <ErrorTemplate outside_errors/> }
-                .into_view(cx)
+            view! { cx, <ErrorTemplate outside_errors/> }.into_view(cx)
         }>
             <main>
                 <Navbar/>

@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use cfg_if::cfg_if;
 use http::status::StatusCode;
 use leptos::*;
@@ -6,16 +8,30 @@ use thiserror::Error;
 #[cfg(feature = "ssr")]
 use leptos_axum::ResponseOptions;
 
+use crate::models::errors::ApiError;
+
 #[derive(Clone, Debug, Error)]
 pub enum AppError {
     #[error("Not Found")]
     NotFound,
+    #[error("API Request failed")]
+    ReqwestError(Arc<reqwest::Error>),
+    #[error("Validation failure occurred")]
+    ValidationFailed(ApiError),
+}
+
+impl From<reqwest::Error> for AppError {
+    fn from(error: reqwest::Error) -> Self {
+        AppError::ReqwestError(Arc::new(error))
+    }
 }
 
 impl AppError {
     pub fn status_code(&self) -> StatusCode {
         match self {
             AppError::NotFound => StatusCode::NOT_FOUND,
+            AppError::ValidationFailed(_) => StatusCode::UNPROCESSABLE_ENTITY,
+            AppError::ReqwestError(_) => StatusCode::INTERNAL_SERVER_ERROR,
         }
     }
 }

@@ -1,9 +1,24 @@
+#![forbid(unsafe_code)]
+#![warn(
+    // missing_docs,
+    missing_debug_implementations,
+    missing_copy_implementations,
+    trivial_casts,
+    unused_allocation,
+    trivial_numeric_casts,
+    clippy::single_char_pattern
+)]
+
 use cfg_if::cfg_if;
+
+pub mod actions;
 pub mod app;
+pub mod components;
 pub mod error_template;
 pub mod fileserv;
-pub mod components;
-pub mod pages;
+pub mod models;
+pub mod routes;
+pub mod services;
 
 cfg_if! { if #[cfg(feature = "hydrate")] {
     use leptos::*;

@@ -53,7 +53,7 @@ pub fn Navbar(cx: Scope) -> impl IntoView {
                 </A>
                 <ul class="nav navbar-nav pull-xs-right">
                     <li class="nav-item">
-                        <A class="nav-link" active_class="active" href="/">
+                        <A class="nav-link" active_class="active" href="/" exact=true>
                             "Home"
                         </A>
                     </li>
