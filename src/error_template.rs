@@ -18,6 +18,8 @@ pub enum AppError {
     ReqwestError(Arc<reqwest::Error>),
     #[error("Validation failure occurred")]
     ValidationFailed(ApiError),
+    #[error("An unexpected error has occurred")]
+    InternalError,
 }
 
 impl From<reqwest::Error> for AppError {
@@ -31,7 +33,7 @@ impl AppError {
         match self {
             AppError::NotFound => StatusCode::NOT_FOUND,
             AppError::ValidationFailed(_) => StatusCode::UNPROCESSABLE_ENTITY,
-            AppError::ReqwestError(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            _ => StatusCode::INTERNAL_SERVER_ERROR,
         }
     }
 }

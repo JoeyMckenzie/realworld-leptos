@@ -36,7 +36,7 @@ pub struct AuthResponse {
     pub user: User,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct User {
     pub username: String,
     pub email: String,

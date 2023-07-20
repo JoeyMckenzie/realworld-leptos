@@ -1,8 +1,7 @@
 use http::{
     header::{ACCEPT, CONTENT_ENCODING},
-    HeaderMap,
+    HeaderMap, StatusCode,
 };
-use leptos::tracing;
 
 use crate::{
     error_template::AppError,
@@ -54,15 +53,19 @@ impl UsersService {
             .send()
             .await?;
 
-        if response.status().is_success() {
-            log::info!("user successfully register");
-            let user = response.json::<AuthResponse>().await?;
-            return Ok(user.user);
+        match response.status() {
+            StatusCode::OK => {
+                log::info!("user successfully register");
+                let user = response.json::<AuthResponse>().await?;
+                Ok(user.user)
+            }
+            StatusCode::UNPROCESSABLE_ENTITY => {
+                log::error!("failed to register user");
+                let validation_errors = response.json::<ApiError>().await?;
+                log::error!("validation failures: {:?}", validation_errors);
+                Err(AppError::ValidationFailed(validation_errors))
+            }
+            _ => Err(AppError::InternalError),
         }
-
-        log::error!("failed to register user");
-        let validation_errors = response.json::<ApiError>().await?;
-        log::error!("validation failures: {:?}", validation_errors);
-        Err(AppError::ValidationFailed(validation_errors))
     }
 }

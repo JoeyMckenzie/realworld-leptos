@@ -1,5 +1,7 @@
-use leptos::*;
+use leptos::{leptos_dom::console_log, tracing::info, *};
 use leptos_router::ActionForm;
+
+use crate::{models::users::User, services::users::UsersService};
 
 #[server(SubmitAuthForm, "/api")]
 #[tracing::instrument(skip(password))]
@@ -7,25 +9,41 @@ pub async fn submit_auth_form(
     username: Option<String>,
     email: String,
     password: String,
-) -> Result<(), ServerFnError> {
+) -> Result<User, ServerFnError> {
     let service = UsersService::new();
-    let response = service.register(username.unwrap(), email, password).await?;
-    Ok(())
+
+    match service.register(username.unwrap(), email, password).await {
+        Ok(user) => Ok(user),
+        Err(e) => Err(ServerFnError::ServerError(e.to_string())),
+    }
+
+    // if let Err(e) = response {
+    //     match e {
+    //         AppError::ValidationFailed(err) => {
+
+    //         },
+    //         _ => return Err(e.into()),
+    //     }
+    // }
 }
 
 #[component]
 pub fn AuthForm(cx: Scope, #[prop(default = true)] include_username: bool) -> impl IntoView {
     let submit_auth_form = create_server_action::<SubmitAuthForm>(cx);
+
     // holds the latest *returned* value from the server
-    let auth_result = submit_auth_form.value();
+    let submit_auth_value = submit_auth_form.value();
+
     // check if the server has returned an error
     let has_error = move || {
-        auth_result.with(|val| {
-            let test = val.as_ref().unwrap();
-            let testt = test.as_ref().unwrap_err();
-            matches!(val, Some(Err(_)));
+        submit_auth_value.with(|val| {
+            if let Some(Err(submit_auth_error)) = val {
+                console_log(&format!("{}", submit_auth_error));
+            }
+            // matches!(val, Some(Err(_)));
         })
     };
+
     let button_text = move || {
         if include_username {
             "Sign up"
