@@ -37,7 +37,7 @@ pub fn AuthForm(cx: Scope, #[prop(default = true)] include_username: bool) -> im
                     set_auth_errors(Some(validation_errors.into_errors()))
                 }
             },
-            Err(_) => (),
+            _ => (),
         },
     };
 
