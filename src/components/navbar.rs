@@ -43,7 +43,7 @@ fn AuthenticatedNavbarItems(cx: Scope) -> impl IntoView {
 
 #[component]
 pub fn Navbar(cx: Scope) -> impl IntoView {
-    let (authenticated, set_authenticated) = create_signal(cx, false);
+    let (authenticated, _set_authenticated) = create_signal(cx, false);
 
     view! { cx,
         <nav class="navbar navbar-light">

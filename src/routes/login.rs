@@ -1,8 +1,6 @@
 use leptos::*;
 use leptos_router::A;
 
-use crate::components::auth_errors::AuthErrors;
-
 #[component]
 pub fn Login(cx: Scope) -> impl IntoView {
     view! { cx,

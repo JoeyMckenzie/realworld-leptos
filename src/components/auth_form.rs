@@ -1,12 +1,7 @@
-use leptos::{leptos_dom::console_log, *};
+use leptos::*;
 use leptos_router::ActionForm;
 
-use crate::{
-    components::auth_errors::AuthErrors,
-    error_template::AppError,
-    models::users::{AuthResponseContext, User},
-    services::users::UsersService,
-};
+use crate::{components::auth_errors::AuthErrors, models::users::AuthResponseContext};
 
 #[server(SubmitAuthForm, "/api")]
 #[tracing::instrument(skip(password))]
@@ -23,23 +18,7 @@ pub async fn submit_auth_form(
 #[component]
 pub fn AuthForm(cx: Scope, #[prop(default = true)] include_username: bool) -> impl IntoView {
     let submit_auth_form = create_server_action::<SubmitAuthForm>(cx);
-    let (auth_errors, set_auth_errors) = create_signal::<Option<Vec<String>>>(cx, None);
-
-    // holds the latest *returned* value from the server
-    let submit_auth_value = submit_auth_form.value();
-
-    match submit_auth_value.get() {
-        None => (),
-        Some(context_result) => match context_result {
-            Ok(context) => match context {
-                AuthResponseContext::AuthenticatedUser(_) => (),
-                AuthResponseContext::ValidationError(validation_errors) => {
-                    set_auth_errors(Some(validation_errors.into_errors()))
-                }
-            },
-            Err(_) => (),
-        },
-    };
+    let auth_errors_or_default: Option<Vec<String>> = Some(vec![]);
 
     let button_text = move || {
         if include_username {
@@ -50,7 +29,7 @@ pub fn AuthForm(cx: Scope, #[prop(default = true)] include_username: bool) -> im
     };
 
     view! { cx,
-        <AuthErrors errors=auth_errors/>
+        <AuthErrors errors=auth_errors_or_default/>
         <ActionForm action=submit_auth_form>
             <Show when=move || include_username fallback=|_| {}>
                 <fieldset class="form-group">
