@@ -1,5 +1,5 @@
 use http::{
-    header::{ACCEPT, CONTENT_ENCODING},
+    header::{ACCEPT, CONTENT_TYPE},
     HeaderMap, StatusCode,
 };
 
@@ -11,7 +11,7 @@ use crate::{
     },
 };
 
-use super::API_BASE_URL;
+use super::{API_BASE_URL, JSON_ENCODING_MEDIA_VALUE};
 
 #[derive(Debug, Clone, Copy)]
 pub struct UsersService;
@@ -29,8 +29,8 @@ impl UsersService {
 
     fn get_client(&self) -> reqwest::Client {
         let mut headers = HeaderMap::new();
-        headers.append(CONTENT_ENCODING, "application/json".parse().unwrap());
-        headers.append(ACCEPT, "application/json".parse().unwrap());
+        headers.append(CONTENT_TYPE, JSON_ENCODING_MEDIA_VALUE.parse().unwrap());
+        headers.append(ACCEPT, JSON_ENCODING_MEDIA_VALUE.parse().unwrap());
         reqwest::ClientBuilder::new()
             .default_headers(headers)
             .build()
@@ -46,10 +46,13 @@ impl UsersService {
         leptos::log!("registering user {}", email);
 
         let request = AuthRequest::new(Some(username), email, password);
+        leptos::log!("{:?}", request);
+        let serialized_request = serde_json::to_string(&request).unwrap();
+        leptos::log!("{}", serialized_request);
         let response = self
             .get_client()
             .post(format!("{}/users", API_BASE_URL))
-            .body(serde_json::to_string(&request).unwrap())
+            .json(&request)
             .send()
             .await?;
 
@@ -60,12 +63,18 @@ impl UsersService {
                 Ok(AuthResponseContext::AuthenticatedUser(user.user))
             }
             StatusCode::UNPROCESSABLE_ENTITY => {
-                leptos::log!("failed to register user");
                 let validation_errors = response.json::<ApiError>().await?;
-                leptos::log!("validation failures: {:?}", validation_errors);
+                leptos::log!(
+                    "failed to register user, validation failures: {:?}",
+                    validation_errors
+                );
                 Ok(AuthResponseContext::ValidationError(validation_errors))
             }
-            _ => Err(AppError::InternalError),
+            _ => {
+                let errors = response.json::<serde_json::Value>().await?;
+                leptos::log!("unexpected error occurred: {}", errors);
+                Err(AppError::InternalError)
+            }
         }
     }
 }

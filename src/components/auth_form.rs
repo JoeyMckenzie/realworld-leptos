@@ -10,18 +10,24 @@ use crate::{
 #[tracing::instrument(skip(password))]
 pub async fn submit_auth_form(
     username: Option<String>,
-    email: String,
-    password: String,
+    email: Option<String>,
+    password: Option<String>,
 ) -> Result<AuthResponseContext, ServerFnError> {
     let service = UsersService::new();
-    let response = service.register(username.unwrap(), email, password).await?;
+    let response = service
+        .register(
+            username.unwrap_or_default(),
+            email.unwrap_or_default(),
+            password.unwrap_or_default(),
+        )
+        .await?;
     Ok(response)
 }
 
 #[component]
 pub fn AuthForm(cx: Scope, #[prop(default = true)] include_username: bool) -> impl IntoView {
     let submit_auth_form = create_server_action::<SubmitAuthForm>(cx);
-    let auth_errors_or_default: Option<Vec<String>> = Some(vec![]);
+    let submit_auth_form_value = submit_auth_form.value();
 
     let button_text = move || {
         if include_username {
@@ -32,7 +38,7 @@ pub fn AuthForm(cx: Scope, #[prop(default = true)] include_username: bool) -> im
     };
 
     view! { cx,
-        <AuthErrors errors=auth_errors_or_default/>
+        <AuthErrors errors=submit_auth_form_value/>
         <ActionForm action=submit_auth_form>
             <Show when=move || include_username fallback=|_| {}>
                 <fieldset class="form-group">
