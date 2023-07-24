@@ -1,0 +1,54 @@
+[env] ## tells cargo make that we're in the context of a Cargo workspace
+DOCKER_BUILD_TAG = "realworld-leptos"
+LOCAL_PORT = 3000
+CONTAINER_PORT = 8080
+
+[tasks.run]
+env = { "RUST_ENV" = "development" }
+install_crate = "cargo-leptos"
+command = "cargo"
+args = ["leptos", "watch"]
+
+[tasks.prepare]
+install_crate = "cargo-chef"
+command = "cargo"
+args = ["+nightly", "chef", "prepare", "--recipe-path", "recipe.json"]
+
+[tasks.docker-build]
+command = "docker"
+args = [
+    "build",
+    ".",
+    "--build-arg",
+    "LEPTOS_SITE_ADDR_PORT=${CONTAINER_PORT}",
+    "-t",
+    "${DOCKER_BUILD_TAG}",
+]
+
+[tasks.docker-run]
+command = "docker"
+args = [
+    "run",
+    "-d",
+    "-p",
+    "${CONTAINER_PORT}:${CONTAINER_PORT}",
+    "--name",
+    "${DOCKER_BUILD_TAG}",
+    "-it",
+    "${DOCKER_BUILD_TAG}",
+]
+
+[tasks.docker-stop]
+command = "docker"
+args = ["stop", "${DOCKER_BUILD_TAG}"]
+
+[tasks.docker-start]
+command = "docker"
+args = ["stop", "${DOCKER_BUILD_TAG}"]
+
+[tasks.docker-rm]
+command = "docker"
+args = ["rm", "${DOCKER_BUILD_TAG}"]
+
+[tasks.docker-rebuild]
+dependencies = ["docker-stop", "docker-rm", "docker-build"]
