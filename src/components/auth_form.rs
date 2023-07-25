@@ -1,3 +1,5 @@
+#![allow(unused_imports)]
+
 use leptos::*;
 use leptos_router::ActionForm;
 
@@ -9,6 +11,7 @@ use crate::{
 #[server(SubmitAuthForm, "/api")]
 #[tracing::instrument(skip(password))]
 pub async fn submit_auth_form(
+    cx: Scope,
     username: Option<String>,
     email: Option<String>,
     password: Option<String>,
@@ -21,6 +24,17 @@ pub async fn submit_auth_form(
             password.unwrap_or_default(),
         )
         .await?;
+
+    match response {
+        AuthResponseContext::AuthenticatedUser(ref user) => {
+            leptos::log!("user registered successful {:?}", user);
+            leptos_axum::redirect(cx, "/");
+        }
+        AuthResponseContext::ValidationError(_) => {
+            leptos::log!("validation occurred, will not redirect")
+        }
+    }
+
     Ok(response)
 }
 

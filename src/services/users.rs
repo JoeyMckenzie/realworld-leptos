@@ -57,8 +57,8 @@ impl UsersService {
             .await?;
 
         match response.status() {
-            StatusCode::OK => {
-                leptos::log!("user successfully register");
+            StatusCode::CREATED => {
+                leptos::log!("user successfully registered");
                 let user = response.json::<AuthResponse>().await?;
                 Ok(AuthResponseContext::AuthenticatedUser(user.user))
             }
