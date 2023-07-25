@@ -1,7 +1,7 @@
 [env] ## tells cargo make that we're in the context of a Cargo workspace
 DOCKER_BUILD_TAG = "realworld-leptos"
 LOCAL_PORT = 3000
-CONTAINER_PORT = 8080
+CONTAINER_PORT = 80
 
 [tasks.run]
 env = { "RUST_ENV" = "development" }
@@ -16,14 +16,7 @@ args = ["+nightly", "chef", "prepare", "--recipe-path", "recipe.json"]
 
 [tasks.docker-build]
 command = "docker"
-args = [
-    "build",
-    ".",
-    "--build-arg",
-    "LEPTOS_SITE_ADDR_PORT=${CONTAINER_PORT}",
-    "-t",
-    "${DOCKER_BUILD_TAG}",
-]
+args = ["build", ".", "-t", "${DOCKER_BUILD_TAG}"]
 
 [tasks.docker-run]
 command = "docker"

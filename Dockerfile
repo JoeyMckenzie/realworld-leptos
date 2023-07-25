@@ -1,6 +1,5 @@
 ARG RUST_VERSION=1.70.0
 ARG DEBIAN_VERSION=11.6
-ARG LEPTOS_SITE_ADDR=""
 
 # all credit goes to https://fasterthanli.me/articles/remote-development-with-rust-on-fly-io#what-the-heck-is-fly-io-for-even
 # for an an awesome walkthrough of docker files for rust, this is more or less a direct copy pasta with a few minor tweaks
@@ -26,12 +25,15 @@ RUN --mount=type=cache,target=/app/target \
     apt clean autoclean; \
     apt autoremove --yes;
 
+# replace the relevant keys in our manifest for deployment to fly
+RUN sed -i 's/env = "DEV"/env = "PROD"/' ./Cargo.toml
+RUN sed -i 's/site-addr = "127.0.0.1:3000"/site-addr = "0.0.0.0:80"/' ./Cargo.toml
+
 # install all the required leptos tools
-RUN rustup install nightly; \
-    rustup target add wasm32-unknown-unknown; \
+RUN rustup target add wasm32-unknown-unknown; \
     cargo install cargo-leptos; \
-    cargo leptos build --release; \
     npm install -g sass; \
+    cargo leptos build --release; \
     objcopy --compress-debug-sections target/server/release/realworld-leptos ./realworld-leptos;
 
 # stage two - we'll utilize a second container to run our built binary from our first container - slim containers!
@@ -51,7 +53,7 @@ WORKDIR /deploy
 ENV LEPTOS_OUTPUT_NAME="realworld-leptos"
 ENV LEPTOS_SITE_ROOT="site"
 ENV LEPTOS_SITE_PKG_DIR="pkg"
-ENV LEPTOS_SITE_ADDR="0.0.0.0:${LEPTOS_SITE_ADDR}"
+ENV LEPTOS_SITE_ADDR="0.0.0.0:80"
 
 # copy over build artifacts from the build stage
 COPY --from=build /app/realworld-leptos ./

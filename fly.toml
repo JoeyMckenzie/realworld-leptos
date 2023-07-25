@@ -1,0 +1,15 @@
+# fly.toml app configuration file generated for realworld-leptos on 2023-07-24T20:37:05-07:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = "realworld-leptos"
+primary_region = "sjc"
+
+[http_service]
+  internal_port = 80
+  force_https = true
+  auto_stop_machines = true
+  auto_start_machines = true
+  min_machines_running = 0
+  processes = ["app"]
