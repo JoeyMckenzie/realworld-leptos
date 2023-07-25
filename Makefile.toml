@@ -1,7 +1,6 @@
 [env] ## tells cargo make that we're in the context of a Cargo workspace
 DOCKER_BUILD_TAG = "realworld-leptos"
-LOCAL_PORT = 3000
-CONTAINER_PORT = 80
+LEPTOS_SITE_ADDR = "127.0.0.1:3000"
 
 [tasks.run]
 env = { "RUST_ENV" = "development" }
@@ -31,7 +30,9 @@ args = [
     "run",
     "-d",
     "-p",
-    "${CONTAINER_PORT}:${CONTAINER_PORT}",
+    "3000:3000",
+    "-e",
+    "LEPTOS_SITE_ADDR=${LEPTOS_SITE_ADDR}",
     "--name",
     "${DOCKER_BUILD_TAG}",
     "-it",

@@ -1,42 +1,7 @@
-#![allow(unused_imports)]
-
 use leptos::*;
 use leptos_router::ActionForm;
 
-use crate::{
-    components::auth_errors::AuthErrors, models::users::AuthResponseContext,
-    services::users::UsersService,
-};
-
-#[server(SubmitAuthForm, "/api")]
-#[tracing::instrument(skip(password))]
-pub async fn submit_auth_form(
-    cx: Scope,
-    username: Option<String>,
-    email: Option<String>,
-    password: Option<String>,
-) -> Result<AuthResponseContext, ServerFnError> {
-    let service = UsersService::new();
-    let response = service
-        .register(
-            username.unwrap_or_default(),
-            email.unwrap_or_default(),
-            password.unwrap_or_default(),
-        )
-        .await?;
-
-    match response {
-        AuthResponseContext::AuthenticatedUser(ref user) => {
-            leptos::log!("user registered successful {:?}", user);
-            leptos_axum::redirect(cx, "/");
-        }
-        AuthResponseContext::ValidationError(_) => {
-            leptos::log!("validation occurred, will not redirect")
-        }
-    }
-
-    Ok(response)
-}
+use crate::{actions::auth::SubmitAuthForm, components::auth_errors::AuthErrors};
 
 #[component]
 pub fn AuthForm(cx: Scope, #[prop(default = true)] include_username: bool) -> impl IntoView {

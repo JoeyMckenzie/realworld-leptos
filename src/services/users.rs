@@ -7,7 +7,7 @@ use crate::{
     error_template::AppError,
     models::{
         errors::ApiError,
-        users::{AuthRequest, AuthResponse, AuthResponseContext},
+        users::{AuthRequest, AuthResponse, User},
     },
 };
 
@@ -42,13 +42,10 @@ impl UsersService {
         username: String,
         email: String,
         password: String,
-    ) -> Result<AuthResponseContext, AppError> {
+    ) -> Result<User, AppError> {
         leptos::log!("registering user {}", email);
 
         let request = AuthRequest::new(Some(username), email, password);
-        leptos::log!("{:?}", request);
-        let serialized_request = serde_json::to_string(&request).unwrap();
-        leptos::log!("{}", serialized_request);
         let response = self
             .get_client()
             .post(format!("{}/users", API_BASE_URL))
@@ -60,7 +57,7 @@ impl UsersService {
             StatusCode::CREATED => {
                 leptos::log!("user successfully registered");
                 let user = response.json::<AuthResponse>().await?;
-                Ok(AuthResponseContext::AuthenticatedUser(user.user))
+                Ok(user.user)
             }
             StatusCode::UNPROCESSABLE_ENTITY => {
                 let validation_errors = response.json::<ApiError>().await?;
@@ -68,11 +65,11 @@ impl UsersService {
                     "failed to register user, validation failures: {:?}",
                     validation_errors
                 );
-                Ok(AuthResponseContext::ValidationError(validation_errors))
+                Err(AppError::ValidationFailed(validation_errors))
             }
             _ => {
                 let errors = response.json::<serde_json::Value>().await?;
-                leptos::log!("unexpected error occurred: {}", errors);
+                leptos::log!("unexpected error occurred: {:?}", errors);
                 Err(AppError::InternalError)
             }
         }

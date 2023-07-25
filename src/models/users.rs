@@ -48,7 +48,7 @@ pub struct AuthResponse {
 pub struct User {
     pub username: String,
     pub email: String,
-    pub bio: String,
-    pub image: String,
+    pub bio: Option<String>,
+    pub image: Option<String>,
     pub token: String,
 }

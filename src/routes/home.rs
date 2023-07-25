@@ -30,13 +30,6 @@ pub fn Home(cx: Scope) -> impl IntoView {
                         <div class="article-preview">
                             <div class="article-meta">
                                 <a href="profile.html">
-                                    //i.imgur.com/Qr71crq.jpg"/>
-                                    //i.imgur.com/Qr71crq.jpg"/>
-                                    //i.imgur.com/Qr71crq.jpg"/>
-                                    //i.imgur.com/Qr71crq.jpg"/>
-                                    //i.imgur.com/Qr71crq.jpg"/>
-                                    //i.imgur.com/Qr71crq.jpg"/>
-                                    //i.imgur.com/Qr71crq.jpg"/>
                                     <img src="http://i.imgur.com/Qr71crq.jpg"/>
                                 </a>
                                 <div class="info">

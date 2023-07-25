@@ -11,6 +11,7 @@
 
 use cfg_if::cfg_if;
 
+mod actions;
 pub mod app;
 pub mod components;
 pub mod error_template;

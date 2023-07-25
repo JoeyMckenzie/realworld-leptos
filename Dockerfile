@@ -21,13 +21,12 @@ RUN --mount=type=cache,target=/app/target \
     set -eux; \
     export DEBIAN_FRONTEND=noninteractive; \
     apt update; \
-    apt install --yes pkg-config libssl-dev; \
+    apt install --yes pkg-config libssl-dev nodejs; \
     apt clean autoclean; \
     apt autoremove --yes;
 
 # replace the relevant keys in our manifest for deployment to fly
 RUN sed -i 's/env = "DEV"/env = "PROD"/' ./Cargo.toml
-RUN sed -i 's/site-addr = "127.0.0.1:3000"/site-addr = "0.0.0.0:80"/' ./Cargo.toml
 
 # install all the required leptos tools
 RUN rustup target add wasm32-unknown-unknown; \
@@ -53,7 +52,6 @@ WORKDIR /deploy
 ENV LEPTOS_OUTPUT_NAME="realworld-leptos"
 ENV LEPTOS_SITE_ROOT="site"
 ENV LEPTOS_SITE_PKG_DIR="pkg"
-ENV LEPTOS_SITE_ADDR="0.0.0.0:80"
 
 # copy over build artifacts from the build stage
 COPY --from=build /app/realworld-leptos ./
