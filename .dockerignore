@@ -3,4 +3,3 @@ target/
 .vscode/
 end2end/
 Cargo.lock
-Cargo.toml

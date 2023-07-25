@@ -1,10 +1,14 @@
 name: Deploy to fly
 
 on:
-  workflow_run:
-    workflows: ["Run CI"]
-    types:
-      - completed
+  #   workflow_run:
+  #     workflows: ["Run CI"]
+  #     types:
+  #       - completed
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
 
 jobs:
   build:
