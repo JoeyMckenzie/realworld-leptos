@@ -10,5 +10,11 @@ Cargo.lock
 # node e2e test tools and outputs
 node_modules/
 test-results/
-end2end/playwright-report/
+e2e/playwright-report/
 playwright/.cache/
+/test-results/
+/playwright-report/
+/playwright/.cache/
+/test-results/
+/playwright-report/
+/playwright/.cache/

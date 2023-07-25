@@ -9,10 +9,17 @@ install_crate = "cargo-leptos"
 command = "cargo"
 args = ["leptos", "watch"]
 
-[tasks.prepare]
-install_crate = "cargo-chef"
+[tasks.test]
+env = { "RUST_ENV" = "development" }
+install_crate = "cargo-leptos"
 command = "cargo"
-args = ["+nightly", "chef", "prepare", "--recipe-path", "recipe.json"]
+args = ["leptos", "test"]
+
+[tasks.e2e]
+env = { "RUST_ENV" = "development" }
+install_crate = "cargo-leptos"
+command = "cargo"
+args = ["leptos", "end-to-end"]
 
 [tasks.docker-build]
 command = "docker"
