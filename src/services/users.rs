@@ -74,4 +74,37 @@ impl UsersService {
             }
         }
     }
+
+    pub async fn login(&self, email: String, password: String) -> Result<User, AppError> {
+        leptos::log!("logging in user {}", email);
+
+        let request = AuthRequest::new(None, email, password);
+        let response = self
+            .get_client()
+            .post(format!("{}/users/login", API_BASE_URL))
+            .json(&request)
+            .send()
+            .await?;
+
+        match response.status() {
+            StatusCode::OK => {
+                leptos::log!("user successfully logged in");
+                let user = response.json::<AuthResponse>().await?;
+                Ok(user.user)
+            }
+            StatusCode::UNPROCESSABLE_ENTITY => {
+                let validation_errors = response.json::<ApiError>().await?;
+                leptos::log!(
+                    "failed to login user, validation failures: {:?}",
+                    validation_errors
+                );
+                Err(AppError::ValidationFailed(validation_errors))
+            }
+            _ => {
+                let errors = response.json::<serde_json::Value>().await?;
+                leptos::log!("unexpected error occurred: {:?}", errors);
+                Err(AppError::InternalError)
+            }
+        }
+    }
 }

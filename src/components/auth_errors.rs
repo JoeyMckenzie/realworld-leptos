@@ -1,7 +1,12 @@
 use leptos::*;
 
+use crate::models::users::User;
+
 #[component]
-pub fn AuthErrors(cx: Scope, errors: RwSignal<Option<Result<(), ServerFnError>>>) -> impl IntoView {
+pub fn AuthErrors(
+    cx: Scope,
+    errors: RwSignal<Option<Result<User, ServerFnError>>>,
+) -> impl IntoView {
     view! { cx,
         <ul class="error-messages">
             {move || {
