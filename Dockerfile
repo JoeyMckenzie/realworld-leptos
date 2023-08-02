@@ -48,7 +48,6 @@ RUN set -eux; \
 
 WORKDIR /deploy
 
-# Must match your `output-name` from the `metadata.leptos` until the next release
 ENV LEPTOS_OUTPUT_NAME="realworld-leptos"
 ENV LEPTOS_SITE_ROOT="site"
 ENV LEPTOS_SITE_PKG_DIR="pkg"

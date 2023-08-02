@@ -10,12 +10,10 @@ pub fn AuthErrors(
     view! { cx,
         <ul class="error-messages">
             {move || {
-                // let test = errors.get();
-                // leptos::log!("{:?}", test);
-                let errors: Option<Vec<String>> = if let Some(Err(context)) = errors.get() {
+                // extract any errors from the error context returned by the auth server actions
+                let errors = if let Some(Err(context)) = errors.get() {
                     match context {
                         ServerFnError::ServerError(server_errors) => {
-                            leptos::log!("{}", server_errors);
                             let parsed_errors: Vec<_> = server_errors
                                 .split('|')
                                 .map(|token| token.to_string())
@@ -27,6 +25,7 @@ pub fn AuthErrors(
                 } else {
                     None
                 };
+
                 view! { cx,
                     {errors
                         .unwrap_or_default()

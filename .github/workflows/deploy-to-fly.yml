@@ -1,8 +1,8 @@
-name: Deploy to fly
+name: Fly
 
 on:
   workflow_run:
-    workflows: ["Run CI"]
+    workflows: ["CI"]
     types:
       - completed
 

@@ -1,6 +1,8 @@
 use leptos::*;
 use leptos_router::A;
 
+use crate::actions::auth::GetUserFromCookie;
+
 #[component]
 fn UnauthenticatedNavbarItems(cx: Scope) -> impl IntoView {
     view! { cx,
@@ -18,7 +20,7 @@ fn UnauthenticatedNavbarItems(cx: Scope) -> impl IntoView {
 }
 
 #[component]
-fn AuthenticatedNavbarItems(cx: Scope) -> impl IntoView {
+fn AuthenticatedNavbarItems(cx: Scope, _username: String) -> impl IntoView {
     view! { cx,
         <li class="nav-item">
             <A class="nav-link" active_class="active" href="/articles/new">
@@ -43,7 +45,8 @@ fn AuthenticatedNavbarItems(cx: Scope) -> impl IntoView {
 
 #[component]
 pub fn Navbar(cx: Scope) -> impl IntoView {
-    let (authenticated, _set_authenticated) = create_signal(cx, false);
+    let user_from_cookie = create_server_action::<GetUserFromCookie>(cx);
+    let user_from_cookie_value = user_from_cookie.value();
 
     view! { cx,
         <nav class="navbar navbar-light">
@@ -58,12 +61,12 @@ pub fn Navbar(cx: Scope) -> impl IntoView {
                         </A>
                     </li>
                     <Show
-                        when=move || authenticated.get()
+                        when=move || user_from_cookie_value.get().is_some()
                         fallback=|cx| {
                             view! { cx, <UnauthenticatedNavbarItems/> }
                         }
                     >
-                        <AuthenticatedNavbarItems/>
+                        <AuthenticatedNavbarItems username=user_from_cookie_value.get().unwrap().unwrap().unwrap()/>
                     </Show>
                 </ul>
             </div>

@@ -1,6 +1,6 @@
 [env] ## tells cargo make that we're in the context of a Cargo workspace
-DOCKER_BUILD_TAG = "realworld-leptos"
-LEPTOS_SITE_ADDR = "127.0.0.1:3000"
+DOCKER_BUILD_TAG = "realworld_leptos"
+DOCKER_LEPTOS_SITE_ADDR = "0.0.0.0:80"
 
 [tasks.run]
 env = { "RUST_ENV" = "development" }
@@ -20,6 +20,10 @@ install_crate = "cargo-leptos"
 command = "cargo"
 args = ["leptos", "end-to-end"]
 
+[tasks.refresh]
+install_crate = "cargo-leptos"
+command = "./scripts/refresh.sh"
+
 [tasks.docker-build]
 command = "docker"
 args = ["build", ".", "-t", "${DOCKER_BUILD_TAG}"]
@@ -29,13 +33,12 @@ command = "docker"
 args = [
     "run",
     "-d",
-    "-p",
-    "3000:3000",
     "-e",
-    "LEPTOS_SITE_ADDR=${LEPTOS_SITE_ADDR}",
+    "LEPTOS_SITE_ADDR=${DOCKER_LEPTOS_SITE_ADDR}",
     "--name",
     "${DOCKER_BUILD_TAG}",
-    "-it",
+    "-p",
+    "3000:80",
     "${DOCKER_BUILD_TAG}",
 ]
 
@@ -46,6 +49,9 @@ args = ["stop", "${DOCKER_BUILD_TAG}"]
 [tasks.docker-start]
 command = "docker"
 args = ["stop", "${DOCKER_BUILD_TAG}"]
+
+[tasks.docker-restart]
+dependencies = ["docker-stop", "docker-rm", "docker-run"]
 
 [tasks.docker-rm]
 command = "docker"

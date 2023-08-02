@@ -27,7 +27,8 @@ http = "0.2.8"
 serde_json = "1"
 serde = { version = "1", features = ["derive"] }
 reqwest = { version = "0.11", features = ["json"] }
-axum-extra = { version = "0.7.5", features = ["cookie"] }
+axum-extra = { version = "0.7", features = ["cookie"] }
+base64 = "0.21"
 
 [features]
 hydrate = ["leptos/hydrate", "leptos_meta/hydrate", "leptos_router/hydrate"]
